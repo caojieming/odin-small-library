@@ -1,3 +1,13 @@
+#add-book {
+  margin-bottom: 20px;
+}
+#add-book > button {
+  margin-bottom: 10px;
+}
+#add-book input {
+  margin-right: 20px;
+}
+
 table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
