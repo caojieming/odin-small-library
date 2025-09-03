@@ -74,12 +74,17 @@ function updateLibrary() {
         status.classList.add("status");
         status.textContent = book.status;
 
+        const deleteBtn = document.createElement("button");
+        deleteBtn.classList.add("delete-btn");
+        deleteBtn.textContent = "Delete";
+
         // attach row contents onto row element
         entry.appendChild(id);
         entry.appendChild(title);
         entry.appendChild(author);
         entry.appendChild(length);
         entry.appendChild(status);
+        entry.appendChild(deleteBtn);
 
         // attach row element to table
         table.appendChild(entry);
@@ -159,7 +164,7 @@ function openBookForm() {
 
         form.appendChild(addBookBtn);
 
-        
+
         bookFormOpen = true;
         bookFormBtn.textContent = "Cancel adding new book"
     }
@@ -175,19 +180,29 @@ function openBookForm() {
 
 
 // for events that may or may not exist, set event listener to document, and check inside function if event's element is the expected element
-document.addEventListener("click", addBook);
+document.addEventListener("click", customButton);
 
-function addBook(event){
+function customButton(event){
     var element = event.target;
 
-    // checking if expected element
-    if(element.id === "add-book-btn"){
+    // add book button pressed
+    if(element.id === "add-book-btn") {
         const title = document.querySelector("#add-book #title-input");
         const author = document.querySelector("#add-book #author-input");
         const length = document.querySelector("#add-book #length-input");
         const status = document.querySelector("#add-book #status-input");
 
         addBookToLibrary(title.value, author.value, length.value, status.value);
+        updateLibrary();
+    }
+
+    // delete button pressed
+    if(element.className === "delete-btn") {
+        const curEntry = element.parentNode;
+        const id = curEntry.querySelector(".id").textContent;
+        
+        const ind = myLibrary.findIndex((element) => element.id === id);
+        myLibrary.splice(ind, 1);
         updateLibrary();
     }
 }
