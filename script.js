@@ -15,14 +15,20 @@ function Book(title, author, length, status) {
     }
 }
 
+// basically just creating another internal Book function, but it's made outside of Book
+Book.prototype.changeStatusTo = function(changedTo) {
+   this.status = changedTo;
+};
+
 function addBookToLibrary(title, author, length, status) {
     let newBook = new Book(title, author, length, status);
     myLibrary.push(newBook);
+    return newBook.id;
 }
  
 // starting books
-addBookToLibrary("The Hobbit", "J.R.R. Tolkien", "295", "not read");
-addBookToLibrary("Harry Potter and the Goblet of Fire", "J.K. Rowling", "298", "finished");
+addBookToLibrary("The Hobbit", "J.R.R. Tolkien", "295", "to read");
+addBookToLibrary("Harry Potter and the Goblet of Fire", "J.K. Rowling", "298", "read");
 
 
 
@@ -42,55 +48,68 @@ function clearDisplay() {
     }
 }
 
-function updateLibrary() {
+function createEntry(idStr, titleStr, authorStr, lengthStr, statusStr) {
+    // create row element
+    const entry = document.createElement("tr");
+    entry.classList.add("entry");
+    
+    // create row contents
+    const id = document.createElement("td");
+    id.classList.add("id");
+    id.textContent = idStr;
+    
+    const title = document.createElement("td");
+    title.classList.add("title");
+    title.textContent = titleStr;
+
+    const author = document.createElement("td");
+    author.classList.add("author");
+    author.textContent = authorStr;
+
+    const length = document.createElement("td");
+    length.classList.add("length");
+    length.textContent = lengthStr;
+
+    // status has 2 children: the text to display status, change status button
+    const status = document.createElement("td");
+    status.classList.add("status");
+
+    const statusText = document.createElement("p");
+    statusText.classList.add("status-text");
+    statusText.textContent = statusStr;
+    status.appendChild(statusText);
+
+    const statusChange = document.createElement("button");
+    statusChange.classList.add("status-change");
+    statusChange.textContent = "Change status";
+    status.appendChild(statusChange);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("delete-btn");
+    deleteBtn.textContent = "Delete";
+
+    // attach row contents onto row element
+    entry.appendChild(id);
+    entry.appendChild(title);
+    entry.appendChild(author);
+    entry.appendChild(length);
+    entry.appendChild(status);
+    entry.appendChild(deleteBtn);
+
+    // attach row element to table
+    table.appendChild(entry);
+}
+
+function recreateLibrary() {
     // fresh start
     clearDisplay();
 
     for(let i = 0; i < myLibrary.length; i++) {
         const book = myLibrary[i];
-        
-        // create row element
-        const entry = document.createElement("tr");
-        entry.classList.add("entry");
-        
-        // create row contents
-        const id = document.createElement("td");
-        id.classList.add("id");
-        id.textContent = book.id;
-        
-        const title = document.createElement("td");
-        title.classList.add("title");
-        title.textContent = book.title;
-
-        const author = document.createElement("td");
-        author.classList.add("author");
-        author.textContent = book.author;
-
-        const length = document.createElement("td");
-        length.classList.add("length");
-        length.textContent = book.length;
-
-        const status = document.createElement("td");
-        status.classList.add("status");
-        status.textContent = book.status;
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.classList.add("delete-btn");
-        deleteBtn.textContent = "Delete";
-
-        // attach row contents onto row element
-        entry.appendChild(id);
-        entry.appendChild(title);
-        entry.appendChild(author);
-        entry.appendChild(length);
-        entry.appendChild(status);
-        entry.appendChild(deleteBtn);
-
-        // attach row element to table
-        table.appendChild(entry);
+        createEntry(book.id, book.title, book.author, book.length, book.status);
     }
 }
-updateLibrary();
+recreateLibrary();
 
 
 // adding books
@@ -145,16 +164,16 @@ function openBookForm() {
         form.appendChild(lengthInput);
         
 
-        const statusLabel = document.createElement("label");
-        statusLabel.setAttribute("for", "status");
-        statusLabel.textContent = "Status: ";
-        const statusInput = document.createElement("input");
-        statusInput.setAttribute("type", "text");
-        statusInput.setAttribute("id", "status-input");
-        statusInput.setAttribute("name", "statusInput");
+        // const statusLabel = document.createElement("label");
+        // statusLabel.setAttribute("for", "status");
+        // statusLabel.textContent = "Status: ";
+        // const statusInput = document.createElement("input");
+        // statusInput.setAttribute("type", "text");
+        // statusInput.setAttribute("id", "status-input");
+        // statusInput.setAttribute("name", "statusInput");
 
-        form.appendChild(statusLabel);
-        form.appendChild(statusInput);
+        // form.appendChild(statusLabel);
+        // form.appendChild(statusInput);
 
 
         const addBookBtn = document.createElement("button");
@@ -190,19 +209,50 @@ function customButton(event){
         const title = document.querySelector("#add-book #title-input");
         const author = document.querySelector("#add-book #author-input");
         const length = document.querySelector("#add-book #length-input");
-        const status = document.querySelector("#add-book #status-input");
+        // const status = document.querySelector("#add-book #status-input");
 
-        addBookToLibrary(title.value, author.value, length.value, status.value);
-        updateLibrary();
+        // addBookToLibrary() both adds a book to myLibrary and returns its ID
+        const id = addBookToLibrary(title.value, author.value, length.value, "to read");
+
+        // just added to myLibrary list, now adding to interface 
+        createEntry(id, title.value, author.value, length.value, "to read");
     }
 
     // delete button pressed
     if(element.className === "delete-btn") {
         const curEntry = element.parentNode;
         const id = curEntry.querySelector(".id").textContent;
-        
         const ind = myLibrary.findIndex((element) => element.id === id);
+
+        // remove from myLibrary
         myLibrary.splice(ind, 1);
-        updateLibrary();
+        
+        // remove from interface
+        table.removeChild(curEntry);
+    }
+
+    // change status button pressed
+    if(element.className === "status-change") {
+        // button is child of td (status cell), which is child of tr (row entry)
+        const curEntry = element.parentNode.parentNode;
+        const id = curEntry.querySelector(".id").textContent;
+        const ind = myLibrary.findIndex((element) => element.id === id);
+        
+        book = myLibrary[ind];
+        if(book.status === "to read") {
+            // change status of book in myLibrary
+            book.changeStatusTo("read");
+            // change status on interface
+            const bookID = curEntry.querySelector(".status-text");
+            bookID.textContent = "read";
+        }
+        else {
+            // change status of book in myLibrary
+            book.changeStatusTo("to read");
+            // change status on interface
+            const bookID = curEntry.querySelector(".status-text");
+            bookID.textContent = "to read";
+        }
+        
     }
 }
