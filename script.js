@@ -1,21 +1,39 @@
 
 const myLibrary = [];
 
-function Book(title, author, length, status) {
-    this.id = crypto.randomUUID()
-    this.title = title;
-    this.author = author;
-    this.length = length;
-    this.status = status;
+class Book {
+    
+    constructor(title, author, length, status) {
+        this.id = crypto.randomUUID()
+        this.title = title;
+        this.author = author;
+        this.length = length;
+        this.status = status;
+    }
 
-    this.info = function() {
+    info() {
         // using `` instead of "" or '' allows embedding vars directly in string
         // `` is call template literals
-        return `ID: ${this.id}, ${this.title} by ${this.author}, ${this.length} pages, ${status}`;
+        return `ID: ${this.id}, ${this.title} by ${this.author}, ${this.length} pages, ${this.status}`;
     }
 }
 
+// function Book(title, author, length, status) {
+//     this.id = crypto.randomUUID()
+//     this.title = title;
+//     this.author = author;
+//     this.length = length;
+//     this.status = status;
+
+//     this.info = function() {
+//         // using `` instead of "" or '' allows embedding vars directly in string
+//         // `` is call template literals
+//         return `ID: ${this.id}, ${this.title} by ${this.author}, ${this.length} pages, ${status}`;
+//     }
+// }
+
 // basically just creating another internal Book function, but it's made outside of Book
+
 Book.prototype.changeStatusTo = function(changedTo) {
    this.status = changedTo;
 };
