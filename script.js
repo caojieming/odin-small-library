@@ -18,25 +18,12 @@ class Book {
     }
 }
 
-// function Book(title, author, length, status) {
-//     this.id = crypto.randomUUID()
-//     this.title = title;
-//     this.author = author;
-//     this.length = length;
-//     this.status = status;
-
-//     this.info = function() {
-//         // using `` instead of "" or '' allows embedding vars directly in string
-//         // `` is call template literals
-//         return `ID: ${this.id}, ${this.title} by ${this.author}, ${this.length} pages, ${status}`;
-//     }
-// }
 
 // basically just creating another internal Book function, but it's made outside of Book
-
 Book.prototype.changeStatusTo = function(changedTo) {
    this.status = changedTo;
 };
+
 
 function addBookToLibrary(title, author, length, status) {
     let newBook = new Book(title, author, length, status);
@@ -44,6 +31,7 @@ function addBookToLibrary(title, author, length, status) {
     return newBook.id;
 }
  
+
 // starting books
 addBookToLibrary("The Hobbit", "J.R.R. Tolkien", "295", "to read");
 addBookToLibrary("Harry Potter and the Goblet of Fire", "J.K. Rowling", "298", "read");
@@ -112,7 +100,9 @@ function createEntry(idStr, titleStr, authorStr, lengthStr, statusStr) {
     entry.appendChild(author);
     entry.appendChild(length);
     entry.appendChild(status);
+    statusChange.addEventListener("click", changeStatus);
     entry.appendChild(deleteBtn);
+    deleteBtn.addEventListener("click", deleteBook);
 
     // attach row element to table
     table.appendChild(entry);
@@ -142,68 +132,68 @@ let bookFormOpen = false;
 function openBookForm() {
     // add book form is not open, so want to open it
     if (!bookFormOpen) {
-
         const form = document.createElement("form");
         addBookSection.appendChild(form);
-
         const titleLabel = document.createElement("label");
-        titleLabel.setAttribute("for", "title");
+        titleLabel.setAttribute("for", "titleInput");
         titleLabel.textContent = "Title: ";
         const titleInput = document.createElement("input");
         titleInput.setAttribute("type", "text");
         titleInput.setAttribute("id", "title-input");
         titleInput.setAttribute("name", "titleInput");
-
+        // 
         form.appendChild(titleLabel);
         form.appendChild(titleInput);
+        // validation
+        titleInput.addEventListener("input", validTitleCheck);
 
 
         const authorLabel = document.createElement("label");
-        authorLabel.setAttribute("for", "author");
+        authorLabel.setAttribute("for", "authorInput");
         authorLabel.textContent = "Author: ";
         const authorInput = document.createElement("input");
         authorInput.setAttribute("type", "text");
         authorInput.setAttribute("id", "author-input");
         authorInput.setAttribute("name", "authorInput");
-
+        // 
         form.appendChild(authorLabel);
         form.appendChild(authorInput);
+        // validation
+        authorInput.addEventListener("input", validAuthorCheck);
 
 
         const lengthLabel = document.createElement("label");
-        lengthLabel.setAttribute("for", "length");
+        lengthLabel.setAttribute("for", "lengthInput");
         lengthLabel.textContent = "# of Pages: ";
         const lengthInput = document.createElement("input");
-        lengthInput.setAttribute("type", "text");
+        lengthInput.setAttribute("type", "number");
         lengthInput.setAttribute("id", "length-input");
         lengthInput.setAttribute("name", "lengthInput");
-
+        // 
         form.appendChild(lengthLabel);
         form.appendChild(lengthInput);
-        
-
-        // const statusLabel = document.createElement("label");
-        // statusLabel.setAttribute("for", "status");
-        // statusLabel.textContent = "Status: ";
-        // const statusInput = document.createElement("input");
-        // statusInput.setAttribute("type", "text");
-        // statusInput.setAttribute("id", "status-input");
-        // statusInput.setAttribute("name", "statusInput");
-
-        // form.appendChild(statusLabel);
-        // form.appendChild(statusInput);
+        // validation
+        lengthInput.addEventListener("input", validLengthCheck);
 
 
         const addBookBtn = document.createElement("button");
         addBookBtn.setAttribute("id", "add-book-btn");
-        addBookBtn.setAttribute("type", "button");
+        // addBookBtn.setAttribute("type", "button");
         addBookBtn.textContent = "Add Book";
-
+        // 
         form.appendChild(addBookBtn);
+        addBookBtn.addEventListener("click", createBook);
 
 
+        // turning the "open creation menu" button into a "close creation menu"
         bookFormOpen = true;
         bookFormBtn.textContent = "Cancel adding new book"
+
+
+        // form submission checking for validity
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+        });
     }
     // add book form is already open, want to close it
     else {
@@ -216,18 +206,47 @@ function openBookForm() {
 }
 
 
-// for events that may or may not exist, set event listener to document, and check inside function if event's element is the expected element
-document.addEventListener("click", customButton);
+// validation checking/setting functions
+function validTitleCheck() {
+    const titleInput = document.querySelector("#title-input");
+    if (titleInput.validity.typeMismatch) {
+        titleInput.setCustomValidity("Invalid title input!");
+    }
+    else {
+        titleInput.setCustomValidity("");
+    }
+}
+function validAuthorCheck() {
+    const authorInput = document.querySelector("#author-input");
+    if (authorInput.validity.typeMismatch) {
+        authorInput.setCustomValidity("Invalid author input!");
+    }
+    else {
+        authorInput.setCustomValidity("");
+    }
+}
+function validLengthCheck() {
+    const lengthInput = document.querySelector("#length-input");
+    if (lengthInput.validity.typeMismatch) {
+        lengthInput.setCustomValidity("Invalid page # input!");
+        console.log("js invalid");
+    }
+    else {
+        lengthInput.setCustomValidity("");
+        console.log("js valid");
+    }
+}
 
-function customButton(event){
-    var element = event.target;
 
-    // add book button pressed
-    if(element.id === "add-book-btn") {
+function createBook() {
+    const titleInput = document.querySelector("#title-input");
+    const authorInput = document.querySelector("#author-input");
+    const lengthInput = document.querySelector("#length-input");
+
+    if(!titleInput.validity.typeMismatch && !authorInput.validity.typeMismatch && !lengthInput.validity.typeMismatch) {
         const title = document.querySelector("#add-book #title-input");
         const author = document.querySelector("#add-book #author-input");
         const length = document.querySelector("#add-book #length-input");
-        // const status = document.querySelector("#add-book #status-input");
 
         // addBookToLibrary() both adds a book to myLibrary and returns its ID
         const id = addBookToLibrary(title.value, author.value, length.value, "to read");
@@ -236,41 +255,45 @@ function customButton(event){
         createEntry(id, title.value, author.value, length.value, "to read");
     }
 
-    // delete button pressed
-    if(element.className === "delete-btn") {
-        const curEntry = element.parentNode;
-        const id = curEntry.querySelector(".id").textContent;
-        const ind = myLibrary.findIndex((element) => element.id === id);
+}
 
-        // remove from myLibrary
-        myLibrary.splice(ind, 1);
-        
-        // remove from interface
-        table.removeChild(curEntry);
+
+function deleteBook(event) {
+    const element = event.target;
+
+    const curEntry = element.parentNode;
+    const id = curEntry.querySelector(".id").textContent;
+    const ind = myLibrary.findIndex((element) => element.id === id);
+
+    // remove from myLibrary
+    myLibrary.splice(ind, 1);
+    
+    // remove from interface
+    table.removeChild(curEntry);
+}
+
+
+function changeStatus(event) {
+    const element = event.target;
+
+    // button is child of td (status cell), which is child of tr (row entry)
+    const curEntry = element.parentNode.parentNode;
+    const id = curEntry.querySelector(".id").textContent;
+    const ind = myLibrary.findIndex((element) => element.id === id);
+    
+    const book = myLibrary[ind];
+    if(book.status === "to read") {
+        // change status of book in myLibrary
+        book.changeStatusTo("read");
+        // change status on interface
+        const bookID = curEntry.querySelector(".status-text");
+        bookID.textContent = "read";
     }
-
-    // change status button pressed
-    if(element.className === "status-change") {
-        // button is child of td (status cell), which is child of tr (row entry)
-        const curEntry = element.parentNode.parentNode;
-        const id = curEntry.querySelector(".id").textContent;
-        const ind = myLibrary.findIndex((element) => element.id === id);
-        
-        book = myLibrary[ind];
-        if(book.status === "to read") {
-            // change status of book in myLibrary
-            book.changeStatusTo("read");
-            // change status on interface
-            const bookID = curEntry.querySelector(".status-text");
-            bookID.textContent = "read";
-        }
-        else {
-            // change status of book in myLibrary
-            book.changeStatusTo("to read");
-            // change status on interface
-            const bookID = curEntry.querySelector(".status-text");
-            bookID.textContent = "to read";
-        }
-        
+    else {
+        // change status of book in myLibrary
+        book.changeStatusTo("to read");
+        // change status on interface
+        const bookID = curEntry.querySelector(".status-text");
+        bookID.textContent = "to read";
     }
 }

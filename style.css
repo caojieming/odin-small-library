@@ -1,40 +1,49 @@
 #add-book {
-  margin-bottom: 20px;
+  	margin-bottom: 20px;
 }
 #add-book > button {
-  margin-bottom: 10px;
+  	margin-bottom: 10px;
 }
 #add-book input {
-  margin-right: 20px;
+  	margin-right: 20px;
 }
 
 table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
+	font-family: arial, sans-serif;
+	border-collapse: collapse;
+	width: 100%;
 }
 td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
+	border: 1px solid #dddddd;
+	text-align: left;
+	padding: 8px;
 }
 tr:nth-child(even) td {
-  background-color: #dddddd;
+  	background-color: #dddddd;
 }
 
 .status-text {
-  display: inline;
+  	display: inline;
 }
 .status-change {
-  float: right;
+  	float: right;
 }
 
 .delete-btn {
-  padding: 10px;
-  background-color: red;
-  border: white 1px solid;
-  color: white;
+	padding: 10px;
+	background-color: red;
+	border: white 1px solid;
+	color: white;
 }
 .delete-btn:active {
-  background-color: rgb(154, 0, 0);
+  	background-color: rgb(154, 0, 0);
+}
+
+
+input:invalid {
+    border: 2px dashed red;
+}
+
+input:valid {
+    border: 2px solid black;
 }
