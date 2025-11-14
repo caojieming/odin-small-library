@@ -139,12 +139,13 @@ function openBookForm() {
         titleLabel.textContent = "Title: ";
         const titleInput = document.createElement("input");
         titleInput.setAttribute("type", "text");
+        titleInput.setAttribute("required", "");
         titleInput.setAttribute("id", "title-input");
         titleInput.setAttribute("name", "titleInput");
         // 
         form.appendChild(titleLabel);
         form.appendChild(titleInput);
-        // validation
+        // custom invalid input message
         titleInput.addEventListener("input", validTitleCheck);
 
 
@@ -153,12 +154,13 @@ function openBookForm() {
         authorLabel.textContent = "Author: ";
         const authorInput = document.createElement("input");
         authorInput.setAttribute("type", "text");
+        authorInput.setAttribute("required", "");
         authorInput.setAttribute("id", "author-input");
         authorInput.setAttribute("name", "authorInput");
         // 
         form.appendChild(authorLabel);
         form.appendChild(authorInput);
-        // validation
+        // custom invalid input message
         authorInput.addEventListener("input", validAuthorCheck);
 
 
@@ -167,12 +169,13 @@ function openBookForm() {
         lengthLabel.textContent = "# of Pages: ";
         const lengthInput = document.createElement("input");
         lengthInput.setAttribute("type", "number");
+        lengthInput.setAttribute("required", "");
         lengthInput.setAttribute("id", "length-input");
         lengthInput.setAttribute("name", "lengthInput");
         // 
         form.appendChild(lengthLabel);
         form.appendChild(lengthInput);
-        // validation
+        // custom invalid input message
         lengthInput.addEventListener("input", validLengthCheck);
 
 
@@ -190,7 +193,7 @@ function openBookForm() {
         bookFormBtn.textContent = "Cancel adding new book"
 
 
-        // form submission checking for validity
+        // form submission checking for validity and bringing up invalid messages (default or custom)
         form.addEventListener("submit", (e) => {
             e.preventDefault();
         });
@@ -209,8 +212,12 @@ function openBookForm() {
 // validation checking/setting functions
 function validTitleCheck() {
     const titleInput = document.querySelector("#title-input");
-    if (titleInput.validity.typeMismatch) {
-        titleInput.setCustomValidity("Invalid title input!");
+
+    // NEED TO RESET THIS TO "" BEFORE CHECKING VALIDITY, OTHERWISE INPUTTING 1 INVALID WILL MAKE EVERY INPUT AFTERWARDS INVALID
+    titleInput.setCustomValidity("");
+
+    if (titleInput.checkValidity() == false) {
+        titleInput.setCustomValidity("Invalid title!");
     }
     else {
         titleInput.setCustomValidity("");
@@ -218,8 +225,12 @@ function validTitleCheck() {
 }
 function validAuthorCheck() {
     const authorInput = document.querySelector("#author-input");
-    if (authorInput.validity.typeMismatch) {
-        authorInput.setCustomValidity("Invalid author input!");
+
+    // NEED TO RESET THIS TO "" BEFORE CHECKING VALIDITY, OTHERWISE INPUTTING 1 INVALID WILL MAKE EVERY INPUT AFTERWARDS INVALID
+    authorInput.setCustomValidity("");
+
+    if (authorInput.checkValidity() == false) {
+        authorInput.setCustomValidity("Invalid author name!");
     }
     else {
         authorInput.setCustomValidity("");
@@ -227,8 +238,12 @@ function validAuthorCheck() {
 }
 function validLengthCheck() {
     const lengthInput = document.querySelector("#length-input");
-    if (lengthInput.validity.typeMismatch) {
-        lengthInput.setCustomValidity("Invalid page # input!");
+
+    // NEED TO RESET THIS TO "" BEFORE CHECKING VALIDITY, OTHERWISE INPUTTING 1 INVALID WILL MAKE EVERY INPUT AFTERWARDS INVALID
+    lengthInput.setCustomValidity("");
+
+    if (lengthInput.checkValidity() == false) {
+        lengthInput.setCustomValidity("Invalid page number!");
         console.log("js invalid");
     }
     else {
@@ -243,7 +258,7 @@ function createBook() {
     const authorInput = document.querySelector("#author-input");
     const lengthInput = document.querySelector("#length-input");
 
-    if(!titleInput.validity.typeMismatch && !authorInput.validity.typeMismatch && !lengthInput.validity.typeMismatch) {
+    if(titleInput.checkValidity() && authorInput.checkValidity() && lengthInput.checkValidity()) {
         const title = document.querySelector("#add-book #title-input");
         const author = document.querySelector("#add-book #author-input");
         const length = document.querySelector("#add-book #length-input");
@@ -253,6 +268,14 @@ function createBook() {
 
         // just added to myLibrary list, now adding to interface 
         createEntry(id, title.value, author.value, length.value, "to read");
+
+
+        // close book creation menu
+        const bookForm = document.querySelector("#add-book form");
+        bookForm.remove();
+
+        bookFormOpen = false;
+        bookFormBtn.textContent = "Add new book"
     }
 
 }
