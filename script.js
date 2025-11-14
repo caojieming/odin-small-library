@@ -244,11 +244,11 @@ function validLengthCheck() {
 
     if (lengthInput.checkValidity() == false) {
         lengthInput.setCustomValidity("Invalid page number!");
-        console.log("js invalid");
+        // console.log("js invalid");
     }
     else {
         lengthInput.setCustomValidity("");
-        console.log("js valid");
+        // console.log("js valid");
     }
 }
 
